@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<script src="jquery-3.5.1.min.js"></script>
+
+	<script>
+		$(() => {
+
+			function showcontent() {
+				let ajaxparams = {
+					data: {},
+					url: "http://localhost:8081/getAllBooks",
+					type: 'get',
+					dataType: 'json',
+					success: (datagivenbyserver) => {
+						books = datagivenbyserver;
+						let bookdetails = "";
+
+						for (let i = 0; i < books.length; i++) {
+							bookdetails += "<br/>" + books[i].bookId + " ," + books[i].bookname + "," + books[i].price;
+						}
+						$("#contents").html(bookdetails);
+					},
+					error: (error) => { console.log("Sever error" + error) }
+				};
+				$.ajax(ajaxparams);
+			}
+			$('#bookid').blur(()=>{
+				let y =$('#bookid').val();
+
+				let ajaxparams= {
+					data : {x:y},
+					url: "http://localhost:8081/getBook",
+					type: 'get',
+					dataType: 'json',
+					success : (output)=>{
+						if(output.bookfoundstatus){
+							$('#msg').text("book found");
+							$('#bookname').val(output.books.bookname);
+							$('#price').val(output.books.price);
+					
+						}
+						else{
+							$('#msg').text("book  not found");
+						}
+					},
+					error : (error)=>{console.log("error"+error)}
+
+				};
+				$.ajax(ajaxparams);
+			});
+
+			$('#add').click(() => {
+				let input = {
+					x: $('#bookid').val(),
+					y: $('#bookname').val(),
+					z: $('#price').val()
+				}
+
+				let ajaxparams = {
+					data: input,
+					url: "http://localhost:8081/addBook",
+					type: 'get',
+					datatype: 'json',
+					success: (output) => {
+						if (output) { $('#msg').text(" book added successfully"); }
+						else {
+							$('#msg').text("could not add book");
+						}
+
+						showcontent();
+					},
+					error: (error) => { console.log("error" + error) }
+				};
+
+				$.ajax(ajaxparams);
+
+
+
+			});
+
+
+
+			showcontent();
+
+		});
+
+
+	</script>
+
+</head>
+
+<body>
+	<input type="text" id="bookid" placeholder="Enter BookId"><span id="msg">Message</span>
+	<br><br>
+	<input type="text" id="bookname" placeholder="Enter Bookname">
+	<br><br>
+	<input type="text" id="price" placeholder="Price">
+	<br><br>
+	<button id="add">Add a book</button>
+	<br><br>
+	<p>Show All Books here :</p>
+	<hr>
+	<p id="contents"></p>
+</body>
+
+</html>
